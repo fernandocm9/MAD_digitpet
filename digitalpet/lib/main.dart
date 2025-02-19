@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 void main() {
@@ -12,52 +14,62 @@ class DigitalPetApp extends StatefulWidget {
 class _DigitalPetAppState extends State<DigitalPetApp> {
   TextEditingController _nameController = TextEditingController();
   void _showNameInputDialog() {
-  showDialog(
-    context: context,
-    barrierDismissible: false, // Prevents closing without entering a name
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: Text("Enter Your Pet's Name"),
-        content: TextField(
-          controller: _nameController,
-          decoration: InputDecoration(hintText: "Pet Name"),
-        ),
-        actions: <Widget>[
-          TextButton(
-            child: Text("OK"),
-            onPressed: () {
-              setState(() {
-                petName = _nameController.text.isNotEmpty ? _nameController.text : "Your Pet";
-              });
-              Navigator.of(context).pop();
-            },
+    showDialog(
+      context: context,
+      barrierDismissible: false, // Prevents closing without entering a name
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Enter Your Pet's Name"),
+          content: TextField(
+            controller: _nameController,
+            decoration: InputDecoration(hintText: "Pet Name"),
           ),
-        ],
-      );
-    },
-  );
-}
-
+          actions: <Widget>[
+            TextButton(
+              child: Text("OK"),
+              onPressed: () {
+                setState(() {
+                  petName =
+                      _nameController.text.isNotEmpty
+                          ? _nameController.text
+                          : "Your Pet";
+                });
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   String petName = "Your Pet";
   int happinessLevel = 50;
   int hungerLevel = 50;
   var petHappyColor = Colors.yellow;
   String petMoodText = 'Nuetral';
+  int _seconds = 0;
+  Timer? _timer;
+
+  // Timer that tracks over time
+  void _startTimer() {
+    _timer = Timer.periodic(Duration(seconds: 30), _decHunger);
+  }
+
   // Function to increase happiness and update hunger when playing with
   // the pet
 
   IconData _getMoodIcon() {
-  if (happinessLevel < 30) {
-    return Icons.sentiment_very_dissatisfied; // Sad face
-  } else if (happinessLevel > 70) {
-    return Icons.sentiment_very_satisfied; // Happy face
-  } else {
-    return Icons.sentiment_neutral; // Neutral face
+    if (happinessLevel < 30) {
+      return Icons.sentiment_very_dissatisfied; // Sad face
+    } else if (happinessLevel > 70) {
+      return Icons.sentiment_very_satisfied; // Happy face
+    } else {
+      return Icons.sentiment_neutral; // Neutral face
+    }
   }
-}
 
-  void _updateMoodText(){
+  void _updateMoodText() {
     setState(() {
       if (happinessLevel < 30) {
         petMoodText = 'Unhappy';
@@ -117,13 +129,27 @@ class _DigitalPetAppState extends State<DigitalPetApp> {
       happinessLevel = (happinessLevel - 20).clamp(0, 100);
     }
   }
-  
+
+  // Decrease hunger level over time
+  void _decHunger(Timer timer) {
+    setState(() {
+      hungerLevel = (hungerLevel + 5).clamp(0, 100);
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _showNameInputDialog();
     });
+    _startTimer();
   }
 
   @override
@@ -138,17 +164,20 @@ class _DigitalPetAppState extends State<DigitalPetApp> {
               children: [
                 Center(
                   child: Container(
-                  width: 200.0,
-                  height: 200.0,
-                  color: petHappyColor,
+                    width: 200.0,
+                    height: 200.0,
+                    color: petHappyColor,
                   ),
                 ),
-                Center( // Center the image
+                Center(
+                  // Center the image
                   child: Image.asset(
                     'assets/images/cartoonDog.jpg',
                     width: 190.0,
                     height: 190.0,
-                    fit: BoxFit.cover, // Or BoxFit.contain if you want it to scale within 190x190
+                    fit:
+                        BoxFit
+                            .cover, // Or BoxFit.contain if you want it to scale within 190x190
                   ),
                 ),
               ],
