@@ -10,6 +10,35 @@ class DigitalPetApp extends StatefulWidget {
 }
 
 class _DigitalPetAppState extends State<DigitalPetApp> {
+  TextEditingController _nameController = TextEditingController();
+  void _showNameInputDialog() {
+  showDialog(
+    context: context,
+    barrierDismissible: false, // Prevents closing without entering a name
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text("Enter Your Pet's Name"),
+        content: TextField(
+          controller: _nameController,
+          decoration: InputDecoration(hintText: "Pet Name"),
+        ),
+        actions: <Widget>[
+          TextButton(
+            child: Text("OK"),
+            onPressed: () {
+              setState(() {
+                petName = _nameController.text.isNotEmpty ? _nameController.text : "Your Pet";
+              });
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      );
+    },
+  );
+}
+
+
   String petName = "Your Pet";
   int happinessLevel = 50;
   int hungerLevel = 50;
@@ -87,6 +116,14 @@ class _DigitalPetAppState extends State<DigitalPetApp> {
       hungerLevel = 100;
       happinessLevel = (happinessLevel - 20).clamp(0, 100);
     }
+  }
+  
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _showNameInputDialog();
+    });
   }
 
   @override
