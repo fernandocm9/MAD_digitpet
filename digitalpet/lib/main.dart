@@ -14,8 +14,32 @@ class _DigitalPetAppState extends State<DigitalPetApp> {
   int happinessLevel = 50;
   int hungerLevel = 50;
   var petHappyColor = Colors.yellow;
+  String petMoodText = 'Nuetral';
   // Function to increase happiness and update hunger when playing with
   // the pet
+
+  IconData _getMoodIcon() {
+  if (happinessLevel < 30) {
+    return Icons.sentiment_very_dissatisfied; // Sad face
+  } else if (happinessLevel > 70) {
+    return Icons.sentiment_very_satisfied; // Happy face
+  } else {
+    return Icons.sentiment_neutral; // Neutral face
+  }
+}
+
+  void _updateMoodText(){
+    setState(() {
+      if (happinessLevel < 30) {
+        petMoodText = 'Unhappy';
+      } else if (happinessLevel > 70) {
+        petMoodText = 'Happy';
+      } else {
+        petMoodText = 'Neutral';
+      }
+    });
+  }
+
   void _changePetColorHappiness() {
     setState(() {
       if (happinessLevel < 30) {
@@ -33,6 +57,7 @@ class _DigitalPetAppState extends State<DigitalPetApp> {
       happinessLevel = (happinessLevel + 10).clamp(0, 100);
       _updateHunger();
       _changePetColorHappiness();
+      _updateMoodText();
     });
   }
 
@@ -52,6 +77,7 @@ class _DigitalPetAppState extends State<DigitalPetApp> {
       happinessLevel = (happinessLevel + 10).clamp(0, 100);
     }
     _changePetColorHappiness();
+    _updateMoodText();
   }
 
   // Increase hunger level slightly when playing with the pet
@@ -88,6 +114,14 @@ class _DigitalPetAppState extends State<DigitalPetApp> {
                     fit: BoxFit.cover, // Or BoxFit.contain if you want it to scale within 190x190
                   ),
                 ),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text('Mood: $petMoodText', style: TextStyle(fontSize: 20.0)),
+                SizedBox(width: 8.0), // Spacing between icon and text
+                Icon(_getMoodIcon(), size: 30.0, color: Colors.blue),
               ],
             ),
             SizedBox(height: 16.0),
